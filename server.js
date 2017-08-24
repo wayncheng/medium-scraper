@@ -27,6 +27,22 @@
 		// we're connected!
 	});
 
+	// SCHEMA =========================================
+	var article = new Schema({
+		linkID: String,
+		title: String,
+		link: String,
+		author: String,
+		author_profile: String,
+		comments: [{
+			body: String,
+			date: Date
+		}],
+		date: { 
+			type: Date, 
+			default: Date.now },
+		saved: Boolean,
+	})
 	// CONFIG =========================================
 	var app = express();
 	var port = process.env.PORT || 5000;
