@@ -68,7 +68,7 @@
 	// app.use("/fetch", fetchController);
 
 	//==================================================
-	app.get("/feed", function(req, res) {
+	app.get("/", function(req, res) {
 		var results = [];
 		var qURL = "https://medium.com/browse/top";
 
@@ -88,6 +88,10 @@
 				var link_raw = $el.find(".postArticle-content a").attr("href");
 				var link_split = link_raw.split("?source");
 				var link = link_split[0];
+				// Removes the https://medium.com/ from the beginning of the url.
+				// Used as ID for an article
+				// var linkTail = link.slice(19).replace('/','-');
+				var linkID = encodeURIComponent(link);
 
 				// Article Thumbnail Image
 				var imageURL = $el
@@ -108,6 +112,7 @@
 				//   .attr("datetime");
 
 				results.push({
+					id: linkID,
 					title: title,
 					link: link,
 					//   image: imageURL,
