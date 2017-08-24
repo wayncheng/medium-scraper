@@ -60,13 +60,72 @@
   // Stock symbols to scrape
   //   var arr = [ "AAPL", "NFLX", "AMZN", "TSLA", "SNAP", "DIS", "NKE", "SBUX", "FB", "BRK.A" ];
   //   var arr = ["AAPL", "NFLX", "AMZN", "TSLA", "TWTR"];
-//   var arr = ["AMZN"];
-
+  //   var arr = ["AMZN"];
 
   // ROUTES =========================================
-  var fetchController = require("./controllers/fetch-controller.js");
-  app.use("/fetch", fetchController);
 
+  // var fetchController = require("./controllers/fetch-controller.js");
+  // app.use("/fetch", fetchController);
+
+  //==================================================
+  app.get("/feed", function(req, res) {
+
+    var results = [];
+    var qURL = "https://medium.com/browse/top";
+
+    request(qURL, function(error, response, html) {
+      var $ = cheerio.load(html);
+      // var all_articles_wrap = $('.js-homeStream');
+      var $article = $(".postArticle");
+
+      $article.each(function(i, el) {
+        var $el = $(el);
+
+        // Grab article title
+        var title = $el.find(".graf--title").text().trim();
+
+        // Link to article
+        // e.g. https://medium.com/@raulk/if-youre-a-startup-you-should-not-use-react-reflecting-on-the-bsd-patents-license-b049d4a67dd2?source=top_stories---------0----------------
+        var link_raw = $el.find(".postArticle-content a").attr("href");
+        var link_split = link_raw.split("?source");
+        var link = link_split[0];
+
+        // Article Thumbnail Image
+        var imageURL = $el.find(".progressiveMedia-image").attr("data-src");
+        var thumbURL = $el.find(".progressiveMedia-thumbnail").attr("src");
+		// u-block u-backgroundSizeCover u-backgroundOriginBorderBox
+        // Meta details
+        var metaWrap = $el.find(".postMetaInline-authorLockup");
+		var authorURL_raw = metaWrap.children("a").attr("href");
+		var authorURL = authorURL_raw.split('?source')[0];
+        var author = metaWrap.children("a").text();
+        var date = metaWrap
+		  .find(".js-postMetaInlineSupplemental a time")
+		  .text();
+        //   .attr("datetime");
+
+        results.push({
+          title: title,
+          link: link,
+          image: imageURL,
+          thumbnail: thumbURL,
+          author: author,
+          author_profile: authorURL,
+          date: date
+		});
+	  });
+	  
+	  console.log("results", results);
+	  res.render('feed',{
+		  results: results,
+		  title: 'Newsfeed'
+	  });
+
+	});
+
+    // }
+  });
+  
   // Basic HTML gets
   var routes = require("./controllers/basic-controller.js");
   app.use("/", routes);

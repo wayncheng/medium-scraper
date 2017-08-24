@@ -157,7 +157,51 @@
 			// console.log('results',results);
 			// db.posts.insert({results});
 		}, //end fetch stock
-		medium: function(cb) {}
+		medium: function(cb) {
+			var results = [];
+			var qURL = 'https://medium.com/browse/top';
+
+				request(qURL, function(error, response, html) {
+					var $ = cheerio.load(html);
+					// var all_articles_wrap = $('.js-homeStream');
+					var $article = $(".postArticle");
+
+					$article.each(function(i,el){
+						$el = $(el);
+
+						// Grab article title
+						var title = $el.find('.graf .graf--title').text().trim();
+						
+						// Link to article
+						// e.g. https://medium.com/@raulk/if-youre-a-startup-you-should-not-use-react-reflecting-on-the-bsd-patents-license-b049d4a67dd2?source=top_stories---------0----------------
+						var link_raw = $el.find('.postArticle-content a').attr('href');
+						var link_split = link_raw.split('?source');
+						var link = link_split[0];
+
+						// Article Thumbnail Image
+						var imageURL = $el.find('.progressiveMedia-image').attr('data-src');
+						var thumbURL = $el.find('.progressiveMedia-thumb').attr('src');
+
+						// Meta details
+						var metaWrap = $('.postMetaInline-authorLockup');
+						var authorURL = metaWrap.children('a').attr('href');
+						var author = metaWrap.children('a').text();
+						var date = metaWrap.find('.js-postMetaInlineSupplemental a time').attr('datetime');
+
+						results.push({
+							title: title,
+							link: link,
+							image: imageURL,
+							thumbnail: thumbURL,
+							author: author,
+							author_profile: authorURL,
+							date: date
+						})
+					})
+				})
+
+			
+		}
 	}; // end fetch object
 
 	module.exports = fetch;

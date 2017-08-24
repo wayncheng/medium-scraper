@@ -6,9 +6,96 @@
 
 
 html {
-	font-size: 12px;
+	font-size: 16px;
+	font-family: Roboto,sans-serif;
 }
 body {
 	margin: 0;
 }
 
+
+
+
+// Navbar =================================
+	nav {
+		justify-content: center;
+		padding: 1rem;
+		box-sizing: border-box;
+		border-bottom: 2px solid rgba(0,0,0,0.24);
+		background-color: #fff;
+		display: flex;
+		.header-wrap {
+			flex-basis: 90%;
+			max-width: 700px;
+			display: flex;
+			justify-content: space-between;
+			.header-menu {
+				&.start {
+					display: flex;
+				}
+			}
+		}
+	}
+
+// Main =====================================
+	main {
+		display: flex;
+		background-color: #ecf0f1;
+		min-height: 100vh;
+		justify-content: center;
+		padding-top: 2rem;
+		padding-bottom: 2rem;
+	}
+	h1 {
+		margin: auto;
+	}
+
+
+// Headline ================================
+	.headline-wrap {
+		padding: 1rem;
+		.headline {
+			font-size: 2rem;
+			font-weight: 900;
+			color: #333;
+			font-family: Roboto, sans-serif;
+		}
+	}
+
+// Feed ====================================
+	.feed {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		box-sizing: border-box;
+
+		.feed-item {
+			display: flex;
+			flex-direction: column;
+			flex-basis: 90%;
+			max-width: 700px;
+			padding: 2rem;
+			box-sizing: border-box;
+			font-family: Roboto,sans-serif;
+			
+			.link-wrap {
+				color: #666;
+			}
+
+			.title-wrap {
+				h2 {
+
+					// flex: 1;
+					font-size: 1.4rem;
+					line-height: 1.3rem;
+					margin-bottom: 1rem;
+					font-weight: 700;
+				}
+			}
+			.meta-wrap {
+				// flex: 1;
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
