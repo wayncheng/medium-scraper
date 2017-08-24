@@ -82,20 +82,28 @@ body {
 				color: #666;
 			}
 
-			.title-wrap {
-				h2 {
+			.title-row {
+				display: flex;
 
-					// flex: 1;
+				.article-title {
+					flex: 1;
 					font-size: 1.4rem;
 					line-height: 1.3rem;
 					margin-bottom: 1rem;
 					font-weight: 700;
 				}
+				
 			}
 			.meta-wrap {
 				// flex: 1;
 				display: flex;
 				justify-content: space-between;
+				.publication_date {
+					&::before {
+						// content: "Publication On: "
+					}
+				}
 			}
+
 		}
 	}

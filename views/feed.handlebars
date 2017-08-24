@@ -4,17 +4,25 @@
 	<a href="https://medium.com/browse/top" class="link-wrap">
 		<h1 class="headline"> Top Stories on Medium </h1>
 	</a>
+	
 	</div>
 
 	{{#each results}}
 	<div class="feed-item box">
 		{{!-- <div class="text-section"> --}}
-			<a href="{{this.link}}" class="link-wrap title-wrap">
-				<h2 class="article-title"> {{this.title}} </h2>
-			</a>
+			<div class="title-row">
+				<a href="{{this.link}}" class="link-wrap article-title">
+					{{this.title}}
+				</a>
+				{{!-- <div class="save-wrap"> --}}
+					<a href="/save" class="save-item" data-status="unsaved">
+						<i class="fa fa-star-o"></i>
+					</a>
+				{{!-- </div> --}}
+			</div>
 			<div class="meta-wrap">
 				<a href="{{this.author_profile}}" class="author">{{this.author}}</a>
-				<p class="publication_date">Published on: {{this.date}}</p>
+				<p class="publication_date">{{this.date}}</p>
 			</div>
 		{{!-- </div> --}}
 
@@ -23,7 +31,6 @@
 				<img src="{{this.thumbnail}}" alt="{{this.title}}">
 			</a>
 		</div> --}}
-
 	</div>
 	{{/each}}
 </div>

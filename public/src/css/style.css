@@ -290,7 +290,12 @@ h1 {
   color: #666;
 }
 
-.feed .feed-item .title-wrap h2 {
+.feed .feed-item .title-row {
+  display: flex;
+}
+
+.feed .feed-item .title-row .article-title {
+  flex: 1;
   font-size: 1.4rem;
   line-height: 1.3rem;
   margin-bottom: 1rem;
