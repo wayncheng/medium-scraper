@@ -18,31 +18,51 @@
 	// MONGOOSE =======================================
 	var mongoose = require("mongoose");
 	mongoose.connect(process.env.MONGODB_URI);
-
-	var Schema = mongoose.Schema;
+	mongoose.connect('mongodb://');
 
 	var db = mongoose.connection;
+
 	db.on("error", console.error.bind(console, "connection error:"));
 	db.once("open", function() {
 		// we're connected!
 	});
 
+	var Schema = mongoose.Schema;
+
+
 	// SCHEMA =========================================
-	var article = new Schema({
-		linkID: String,
-		title: String,
-		link: String,
-		author: String,
-		author_profile: String,
-		comments: [{
-			body: String,
-			date: Date
-		}],
-		date: { 
-			type: Date, 
-			default: Date.now },
-		saved: Boolean,
-	})
+	// var Article = new Schema({
+	// 	linkID: String,
+	// 	title: String,
+	// 	link: String,
+	// 	author: String,
+	// 	author_profile: String,
+	// 	comments: [{
+	// 		body: String,
+	// 		date: Date
+	// 	}],
+	// 	date: { 
+	// 		type: Date, 
+	// 		default: Date.now },
+	// 		saved: Boolean,
+	// 	});
+		
+		// db.Article.create({
+			// 	linkID: "https%3A%2F%2Fmedium.com%2F%40benjaminhardy%2Fwant-to-become-the-best-at-what-you-do-read-this-75888a1aa35a",
+			// 	title: 'Title of the Article Blah Blah Whatever',
+			// 	link: 'https://medium.com/@benjaminhardy/want-to-become-the-best-at-what-you-do-read-this-75888a1aa35a',
+			// 	author: 'Wayne Cheng',
+			// 	author_profile: 'instagram.com/wayncheng',
+			// 	saved: false
+			// });
+			
+	// MODELS =========================================
+		mongoose.model('articles', {
+			title: String,
+			link: String,
+			author: String
+		})			
+			
 	// CONFIG =========================================
 	var app = express();
 	var port = process.env.PORT || 5000;
@@ -84,6 +104,11 @@
 	// app.use("/fetch", fetchController);
 
 	//==================================================
+	app.get('/articles', function(req,res){
+		mongoose.model('articles').find(function(err, articles){
+			res.json(articles);
+		})
+	})
 	app.get("/", function(req, res) {
 		var results = [];
 		var qURL = "https://medium.com/browse/top";
