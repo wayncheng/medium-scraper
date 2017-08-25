@@ -2,21 +2,21 @@
 	<div class="headline-wrap">
 
 	<a href="https://medium.com/browse/top" class="link-wrap">
-		<h1 class="headline"> Top Stories on Medium </h1>
+		<h1 class="headline"> {{title}} </h1>
 	</a>
 	
 	</div>
 
 	{{#each results}}
-	<div class="feed-item box">
+	<div class="feed-item box" data-mongodb-id="{{this._id}}">
 		{{!-- <div class="text-section"> --}}
 			<div class="title-row">
 				<a href="{{this.link}}" class="link-wrap article-title">
 					{{this.title}}
 				</a>
 				{{!-- <div class="save-wrap"> --}}
-					<a href="/save" class="save-item" data-status="unsaved">
-						<i class="fa fa-star-o"></i>
+					<a href="#" class="save-item" data-save-status="{{this.saved}}">
+						<i class="fa fa-star"></i>
 					</a>
 				{{!-- </div> --}}
 			</div>

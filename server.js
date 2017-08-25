@@ -11,6 +11,7 @@
 	// var mongojs = require("mongojs");
 	const request = require("request");
 	const cheerio = require("cheerio");
+	const moment = require('moment');
 
 	// Database configuration
 	// var databaseUrl = "exchanges";
@@ -52,8 +53,9 @@
 		next();
 	});
 	//=================================================
-		// mongoose.connect(process.env.MONGODB_URI);
-		mongoose.connect('mongodb://localhost:27017');
+		mongoose.connect(process.env.MONGODB_URI);
+		// mongoose.connect('mongodb://localhost:27017');
+		// mongoose.connect('mongodb://localhost/medium_articles');
 		var db = mongoose.connection;
 	
 		db.on('error', function(err){
@@ -67,25 +69,37 @@
 		var Schema = mongoose.Schema;
 	
 	//=================================================
-	// var qURL = `https://finance.yahoo.com/quote/${symbol}?p=${symbol}`; // Yahoo Finance URL
-	//=================================================
-	// Stock symbols to scrape
-	//   var arr = [ "AAPL", "NFLX", "AMZN", "TSLA", "SNAP", "DIS", "NKE", "SBUX", "FB", "BRK.A" ];
-	//   var arr = ["AAPL", "NFLX", "AMZN", "TSLA", "TWTR"];
-	//   var arr = ["AMZN"];
-
-	// ROUTES =========================================
-
-	// var fetchController = require("./controllers/fetch-controller.js");
-	// app.use("/fetch", fetchController);
+		//   var entry = new Article({
+		// 	  title: 'Pizza is delicious.',
+		// 	  link: 'https://che.ng',
+		// 	  author: 'Batman Batman',
+		// 	  author_profile: 'https://instagram.com/wayncheng',
+		// 	  date: 'Aug 24'
+		//   });
+	
+		//   // Now, save that entry to the db
+		//   entry.save(function(err, doc) {
+		// 	if (err) { console.log(err); }
+		// 	else {
+		// 	  console.log(doc);
+		// 	}
+		//   });
 
 	//==================================================
-	app.get('/articles', function(req,res){
-		mongoose.model('articles').find(function(err, articles){
-			res.json(articles);
-		})
+	app.get('/', function(req,res){
+		Article.find({}, function(error, doc) {
+			if (error) { console.log(error); }
+			else {
+			//   res.json(doc);
+			  res.render('feed', {
+				  results: doc,
+				  title: 'Top Stories on Medium'
+			  })
+			}
+		  });
 	})
-	app.get("/", function(req, res) {
+//==================================================
+	app.get("/fetch", function(req, res) {
 		var results = [];
 		var qURL = "https://medium.com/browse/top";
 
@@ -123,40 +137,67 @@
 				var authorURL_raw = metaWrap.children("a").attr("href");
 				var authorURL = authorURL_raw.split("?source")[0];
 				var author = metaWrap.children("a").text();
-				var date = metaWrap
+				var dateRaw = metaWrap
 					.find(".js-postMetaInlineSupplemental a time")
-					.text();
-				//   .attr("datetime");
-
-				results.push({
-					id: linkID,
-					title: title,
-					link: link,
+					.attr("datetime");
+					// .text();
+				var date = moment(dateRaw).format('MMM D, YY');
+					// id: linkID,
 					//   image: imageURL,
 					//   thumbnail: thumbURL,
+				let articleData = new Article({
+					title: title,
+					link: link,
 					author: author,
 					author_profile: authorURL,
 					date: date
 				});
+				articleData.save(function(err,doc){
+					if(err) throw err;
+					else {
+						console.log('doc',doc);
+					}
+				})
 			});
 
-			console.log("results", results);
-			res.render("feed", {
-				results: results,
-				title: "Newsfeed"
-			});
+			// console.log("results", results);
+			// res.render("feed", {
+				// results: results,
+				// title: "Newsfeed"
+			// });
+			res.redirect('/');
 		});
 
 		// }
 	});
 
-	// SAVE ITEMS ==================================================
-	app.post("/save", (req, res) => {
-		var { title, link, author, author_profile, date } = req.body;
-		console.log("req.body", req.body);
-		// Save to Database here
-	});
+// SAVING ITEMS ==================================================
+	app.post("/api/save", function(req, res){
+		let { _id, saved } = req.body;
+		console.log('--> _id',_id);
+		console.log('--> saved',saved);
+		
+		// Find document by id, then updated saved to the new status, which we got above
+		let query = {_id: _id};
+		Article.findOneAndUpdate(query, {$set: { saved: saved }}, function(err,doc){
+			if(err) console.log(err)
+		});
 
+		// Refresh page afterwards
+		res.redirect('/');
+	});
+// SAVED PAGE ==================================================
+	app.get('/saved', function(req,res){
+		Article.find({saved: true}, function(err,docs){
+			if (err) console.log(err);
+			else {
+				res.render('feed', {
+					results: docs,
+					title: "Saved Items"
+				})
+			}
+		})
+	})
 	// Basic HTML gets
 	var routes = require("./controllers/basic-controller.js");
 	app.use("/", routes);

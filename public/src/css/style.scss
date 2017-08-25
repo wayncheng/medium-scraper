@@ -94,15 +94,16 @@ body {
 				}
 				
 			}
+			.save-item {
+				color: $mono-light;
+				&[data-save-status="true"] {
+					color: $yellow;
+				}
+			}
 			.meta-wrap {
 				// flex: 1;
 				display: flex;
 				justify-content: space-between;
-				.publication_date {
-					&::before {
-						// content: "Publication On: "
-					}
-				}
 			}
 
 		}

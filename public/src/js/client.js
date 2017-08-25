@@ -5,35 +5,48 @@ $('.save-item').on('click',function(e){
 
 	var $t = $(this);
 	var $feedItem = $t.parents('.feed-item');
+	var mongoID = $feedItem.attr('data-mongodb-id');
+// 	// Get data from feed item
+// 	// var feedItemData = {
+// 	// 	title: $feedItem.find('.article-title').text(),
+// 	// 	link: $feedItem.find('.link-wrap').attr('href'),
+// 	// 	author: $feedItem.find('.author').text(),
+// 	// 	author_profile: $feedItem.find('.author').attr('href'),
+// 	// 	date: $feedItem.find('.publication_date').text()
+// 	// }
+// 	// console.log('feedItemData',feedItemData);
 
-	// Get data from feed item
-	var feedItemData = {
-		title: $feedItem.find('.article-title').text(),
-		link: $feedItem.find('.link-wrap').attr('href'),
-		author: $feedItem.find('.author').text(),
-		author_profile: $feedItem.find('.author').attr('href'),
-		date: $feedItem.find('.publication_date').text()
+// 	// State Change
+	// var isSaved = $t.hasClass('saved');
+	var saveStatusAttr = $t.attr('data-save-status');
+	var newSaveState;
+
+	if (saveStatusAttr === 'false') {
+		console.log('not saved --> saving to db');
+		// $t.addClass('saved');
+		$t.attr('data-save-status', 'true');
+		newSaveState = true;
 	}
-	console.log('feedItemData',feedItemData);
+	else if (saveStatusAttr === 'true'){
+		console.log('already saved --> removing from db');
+		// $t.removeClass('saved');
+		$t.attr('data-save-status','false');
+		newSaveState = false;
+	}
 
-	// State Change
-	var isSaved = $t.hasClass('saved');
-	if (!isSaved) {
-		console.log('!isSaved --> saving to db');
-		$t.addClass('saved');
-		
 		$.ajax({
 			type: "POST",
-			data: feedItemData,
-			url: '/save'
+			url: '/api/save',
+			data: { 
+				_id: mongoID,
+				saved: newSaveState 
+			}
 		}).done(function(res){
-			console.log('res',res);
+			// console.log('res',res);
+			console.log('save status updated');
 		})
-	}
-	else if (isSaved){
-		console.log('isSaved --> removing from db');
-		$t.removeClass('saved');
 
-	}
+		
 	
-	})
+	
+})

@@ -302,6 +302,14 @@ h1 {
   font-weight: 700;
 }
 
+.feed .feed-item .save-item {
+  color: #bdc3c7;
+}
+
+.feed .feed-item .save-item[data-save-status="true"] {
+  color: #f1c40f;
+}
+
 .feed .feed-item .meta-wrap {
   display: flex;
   justify-content: space-between;
