@@ -1,71 +1,29 @@
 "use strict";
 (function() {
 	// DEPENDENCIES ===================================
-	var express = require("express");
-	var bodyParser = require("body-parser");
-	var exphbs = require("express-handlebars");
-	var path = require("path");
-	var methodOverride = require("method-override");
+	const express = require("express");
+	const bodyParser = require("body-parser");
+	const logger = require('morgan');
+	const exphbs = require("express-handlebars");
+	const path = require("path");
+	const methodOverride = require("method-override");
 	require("dotenv").config();
 	// var mongojs = require("mongojs");
-	var request = require("request");
-	var cheerio = require("cheerio");
+	const request = require("request");
+	const cheerio = require("cheerio");
 
 	// Database configuration
 	// var databaseUrl = "exchanges";
 	// var collections = ["nyse", "nasdaq"];
 
-	// MONGOOSE =======================================
-	var mongoose = require("mongoose");
-	mongoose.connect(process.env.MONGODB_URI);
-	mongoose.connect('mongodb://');
+// CONFIG =======================================
+	const mongoose = require("mongoose");
+	const Article = require('./models/Article.js');
+	const Comment = require('./models/Comment.js');
+	mongoose.Promise = Promise;
 
-	var db = mongoose.connection;
-
-	db.on("error", console.error.bind(console, "connection error:"));
-	db.once("open", function() {
-		// we're connected!
-	});
-
-	var Schema = mongoose.Schema;
-
-
-	// SCHEMA =========================================
-	// var Article = new Schema({
-	// 	linkID: String,
-	// 	title: String,
-	// 	link: String,
-	// 	author: String,
-	// 	author_profile: String,
-	// 	comments: [{
-	// 		body: String,
-	// 		date: Date
-	// 	}],
-	// 	date: { 
-	// 		type: Date, 
-	// 		default: Date.now },
-	// 		saved: Boolean,
-	// 	});
-		
-		// db.Article.create({
-			// 	linkID: "https%3A%2F%2Fmedium.com%2F%40benjaminhardy%2Fwant-to-become-the-best-at-what-you-do-read-this-75888a1aa35a",
-			// 	title: 'Title of the Article Blah Blah Whatever',
-			// 	link: 'https://medium.com/@benjaminhardy/want-to-become-the-best-at-what-you-do-read-this-75888a1aa35a',
-			// 	author: 'Wayne Cheng',
-			// 	author_profile: 'instagram.com/wayncheng',
-			// 	saved: false
-			// });
-			
-	// MODELS =========================================
-		mongoose.model('articles', {
-			title: String,
-			link: String,
-			author: String
-		})			
-			
-	// CONFIG =========================================
-	var app = express();
-	var port = process.env.PORT || 5000;
+	const app = express();
+	const port = process.env.PORT || 5000;
 
 	app.disable("x-powered-by");
 
@@ -76,9 +34,12 @@
 	app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 	app.set("view engine", "handlebars");
 
+	// Use morgan with app
+	app.use(logger('dev'));
+	
 	// Set Body Parser
 	app.use(bodyParser.json());
-	app.use(bodyParser.urlencoded({ extended: true }));
+	app.use(bodyParser.urlencoded({ extended: false }));
 	app.use(bodyParser.text());
 	app.use(bodyParser.json({ type: "application/vnd.api+json" }));
 
@@ -90,6 +51,21 @@
 		console.log("url : " + req.url);
 		next();
 	});
+	//=================================================
+		// mongoose.connect(process.env.MONGODB_URI);
+		mongoose.connect('mongodb://localhost:27017');
+		var db = mongoose.connection;
+	
+		db.on('error', function(err){
+			console.log('Mongoose error:',err);
+		})
+		db.once("open", function() {
+			// we're connected!
+			console.log('Mongoose connected!');
+		});
+	
+		var Schema = mongoose.Schema;
+	
 	//=================================================
 	// var qURL = `https://finance.yahoo.com/quote/${symbol}?p=${symbol}`; // Yahoo Finance URL
 	//=================================================
