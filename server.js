@@ -53,10 +53,10 @@
 		next();
 	});
 	//=================================================
-	mongoose.connect(process.env.MONGODB_URI);
+	// mongoose.connect(process.env.MONGODB_URI);
 	// mongoose.connect(process.env.MONGODB_URI_ALT);
 	// mongoose.connect('mongodb://localhost:27017');
-	// mongoose.connect("mongodb://localhost/medium_articles");
+	mongoose.connect("mongodb://localhost/medium_articles");
 	var db = mongoose.connection;
 
 	db.on("error", function(err) {

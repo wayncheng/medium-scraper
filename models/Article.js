@@ -35,10 +35,10 @@ var ArticleSchema = new Schema({
 		default: false
 	},
 	// This only saves one note's ObjectId, ref refers to the Note model
-	comment: {
+	comment: [{
 		type: Schema.Types.ObjectId,
 		ref: "Comment"
-	}
+	}]
 });
 
 // Create the Article model with the ArticleSchema

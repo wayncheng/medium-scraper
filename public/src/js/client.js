@@ -76,6 +76,8 @@ $('.toggle-comments').on('click',function(e){
 //==================================================
 $('.remove-comment').on('click', function(e){
 	e.preventDefault();
+	console.log('remove-comment clicked');
+	console.log('$(this)',$(this));
 	var $comment = $(this).parents('.comment');
 	var commentID = $comment.attr('data-comment-id');
 	console.log('commentID',commentID);
@@ -87,7 +89,7 @@ $('.remove-comment').on('click', function(e){
 		console.log('r',r);
 		$comment.remove();
 	})
-})
+});
 //==================================================
 $('#submit-comment').on('click',function(e){
 	e.preventDefault();
@@ -113,14 +115,30 @@ $('#submit-comment').on('click',function(e){
 //==================================================
 function buildComment(commentText, commentID){
 	var $newComment = $('<div/>');
-		$newComment.addClass('comment');
-		$newComment.attr('data-comment-id', commentID);
-
+		$newComment.addClass('comment notification is-primary');
+		
 	var $p = $('<p/>').addClass('comment-text');
 		$p.text(commentText);
-	
-	var $closeLink = $('<a/>').addClass('remove-comment');
+		
 	var $closeIcon = $('<i/>').addClass('fa fa-window-close');
+	var $closeLink = $('<a/>').addClass('remove-comment');
+		$closeLink.attr('data-comment-id', commentID);
+		$closeLink.on('click', function(e){
+			e.preventDefault();
+			console.log('remove-comment clicked');
+			console.log('$(this)',$(this));
+			var $comment = $(this).parents('.comment');
+			var commentID = $comment.attr('data-comment-id');
+			console.log('commentID',commentID);
+		
+			$.ajax({
+				type: 'GET',
+				url: '/api/remove/'+commentID
+			}).done(function(r){
+				console.log('r',r);
+				$comment.remove();
+			})
+		});
 	$closeLink.append($closeIcon);
 
 	$newComment.append($p);
