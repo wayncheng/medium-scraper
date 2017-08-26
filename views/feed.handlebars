@@ -23,7 +23,11 @@
 			<div class="meta-wrap">
 				<a href="{{this.author_profile}}" class="author">{{this.author}}</a>
 				<p class="publication_date">{{this.date}}</p>
+					<a href="#" class="toggle-comments">
+						<i class="fa fa-comment-o"></i>
+					</a>
 			</div>
+			<div class="below-fold"></div>
 		{{!-- </div> --}}
 
 		{{!-- <div class="thumbnail-section">
@@ -33,4 +37,23 @@
 		</div> --}}
 	</div>
 	{{/each}}
+
+	<section id="comments-section" class="" data-mongodb-id="">
+		<div class="container">
+		<div id="posted-comments">
+			<div class="comment">
+				<p class="comment-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+			</div>
+		</div>
+		<div id="new-comment-area">
+			<h4>Leave your comment here:</h4>
+			<textarea id="new-comment" placeholder="Comment here"></textarea>
+			<a id="submit-comment" href="#" class="button is-info">Submit</a>
+			</div>
+		</div>
+		<a id="close-section" class="button" href="#">
+			Close Comments
+			<i class="fa fa-close"></i>
+		</a>
+	</section>
 </div>

@@ -53,9 +53,10 @@
 		next();
 	});
 	//=================================================
-		mongoose.connect(process.env.MONGODB_URI);
+		// mongoose.connect(process.env.MONGODB_URI);
+		// mongoose.connect(process.env.MONGODB_URI_ALT);
 		// mongoose.connect('mongodb://localhost:27017');
-		// mongoose.connect('mongodb://localhost/medium_articles');
+		mongoose.connect('mongodb://localhost/medium_articles');
 		var db = mongoose.connection;
 	
 		db.on('error', function(err){
@@ -86,6 +87,8 @@
 		//   });
 
 	//==================================================
+	let newArticleCount = 0;
+	//==================================================
 	app.get('/', function(req,res){
 		Article.find({}, function(error, doc) {
 			if (error) { console.log(error); }
@@ -93,7 +96,8 @@
 			//   res.json(doc);
 			  res.render('feed', {
 				  results: doc,
-				  title: 'Top Stories on Medium'
+				  title: 'Top Stories on Medium',
+				  newArticleCount: newArticleCount
 			  })
 			}
 		  });
@@ -119,52 +123,46 @@
 				var link_raw = $el.find(".postArticle-content a").attr("href");
 				var link_split = link_raw.split("?source");
 				var link = link_split[0];
-				// Removes the https://medium.com/ from the beginning of the url.
-				// Used as ID for an article
-				// var linkTail = link.slice(19).replace('/','-');
-				var linkID = encodeURIComponent(link);
 
-				// Article Thumbnail Image
-				var imageURL = $el
-					.find(".progressiveMedia-image")
-					.attr("data-src");
-				var thumbURL = $el
-					.find(".progressiveMedia-thumbnail")
-					.attr("src");
-				// u-block u-backgroundSizeCover u-backgroundOriginBorderBox
-				// Meta details
-				var metaWrap = $el.find(".postMetaInline-authorLockup");
-				var authorURL_raw = metaWrap.children("a").attr("href");
-				var authorURL = authorURL_raw.split("?source")[0];
-				var author = metaWrap.children("a").text();
-				var dateRaw = metaWrap
-					.find(".js-postMetaInlineSupplemental a time")
-					.attr("datetime");
-					// .text();
-				var date = moment(dateRaw).format('MMM D, YY');
-					// id: linkID,
-					//   image: imageURL,
-					//   thumbnail: thumbURL,
-				let articleData = new Article({
-					title: title,
-					link: link,
-					author: author,
-					author_profile: authorURL,
-					date: date
-				});
-				articleData.save(function(err,doc){
-					if(err) throw err;
-					else {
-						console.log('doc',doc);
+				// Check if link is already in database using count...
+				// If the count for matches is greater than 0, exit.
+				Article.count({link: link}, function (err, count){ 
+					if(count>0){
+						return;
 					}
-				})
-			});
+					else {
+						newArticleCount++;
+						
+						// Article Thumbnail Image (doesn't work)
+						// var imageURL = $el.find(".progressiveMedia-image").attr("data-src");
+						// var thumbURL = $el.find(".progressiveMedia-thumbnail").attr("src").u-block u-backgroundSizeCover u-backgroundOriginBorderBox
+						
+						// Meta details
+						var metaWrap = $el.find(".postMetaInline-authorLockup");
+						
+						var authorURL_raw = metaWrap.children("a").attr("href");
+						var authorURL = authorURL_raw.split("?source")[0];
+						var author = metaWrap.children("a").text();
+						
+						var dateRaw = metaWrap.find(".js-postMetaInlineSupplemental a time").attr("datetime");
+						var date = moment(dateRaw).format('MMM D, YY');
 
-			// console.log("results", results);
-			// res.render("feed", {
-				// results: results,
-				// title: "Newsfeed"
-			// });
+						let articleData = new Article({
+							title: title,
+							link: link,
+							author: author,
+							author_profile: authorURL,
+							date: date
+						});
+						articleData.save(function(err,doc){
+							if(err) throw err;
+							else {
+								console.log('doc',doc);
+							}
+						})
+					}
+				}); 
+			});
 			res.redirect('/');
 		});
 
@@ -182,6 +180,23 @@
 		Article.findOneAndUpdate(query, {$set: { saved: saved }}, function(err,doc){
 			if(err) console.log(err)
 		});
+
+		// Refresh page afterwards
+		res.redirect('/');
+	});
+
+// SUBMIT COMMENT ==================================================
+	app.post("/api/submit-comment", function(req, res){
+		let { _id, commentText } = req.body;
+		console.log('--> _id',_id);
+		console.log('--> commentText',commentText);
+
+		
+		// Find document by id, then updated saved to the new status, which we got above
+		// let query = {_id: _id};
+		// Article.findOneAndUpdate(query, {$set: { saved: saved }}, function(err,doc){
+		// 	if(err) console.log(err)
+		// });
 
 		// Refresh page afterwards
 		res.redirect('/');

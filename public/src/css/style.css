@@ -314,3 +314,65 @@ h1 {
   display: flex;
   justify-content: space-between;
 }
+
+#comments-section {
+  width: 100%;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  display: none;
+  background-color: #fff;
+  height: initial;
+  max-height: 100vh;
+}
+
+#comments-section.active {
+  display: inline-block;
+}
+
+#comments-section .container {
+  display: flex;
+  flex-direction: column;
+  height: inherit;
+  max-width: 700px;
+  padding: 2rem 0;
+  outline: 1px solid green;
+}
+
+#comments-section .container #posted-comments {
+  outline: 1px solid blue;
+  padding: 1rem;
+  margin: 2rem 0;
+}
+
+#comments-section .container #posted-comments .comment {
+  padding: 1rem;
+}
+
+#comments-section .container #new-comment-area {
+  display: flex;
+  flex-direction: column;
+}
+
+#comments-section .container #new-comment-area textarea {
+  font-size: 1.5rem;
+  flex-basis: 60px;
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+#comments-section .container #new-comment-area #submit-comment {
+  max-width: 100px;
+}
+
+#comments-section #close-section {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  opacity: .5;
+  font-size: 14px;
+}
+
+#comments-section #close-section i {
+  margin-left: 6px;
+}
