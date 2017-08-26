@@ -3,7 +3,7 @@
 	// DEPENDENCIES ===================================
 	const express = require("express");
 	const bodyParser = require("body-parser");
-	const logger = require('morgan');
+	const logger = require("morgan");
 	const exphbs = require("express-handlebars");
 	const path = require("path");
 	const methodOverride = require("method-override");
@@ -11,16 +11,16 @@
 	// var mongojs = require("mongojs");
 	const request = require("request");
 	const cheerio = require("cheerio");
-	const moment = require('moment');
+	const moment = require("moment");
 
 	// Database configuration
 	// var databaseUrl = "exchanges";
 	// var collections = ["nyse", "nasdaq"];
 
-// CONFIG =======================================
+	// CONFIG =======================================
 	const mongoose = require("mongoose");
-	const Article = require('./models/Article.js');
-	const Comment = require('./models/Comment.js');
+	const Article = require("./models/Article.js");
+	const Comment = require("./models/Comment.js");
 	mongoose.Promise = Promise;
 
 	const app = express();
@@ -36,8 +36,8 @@
 	app.set("view engine", "handlebars");
 
 	// Use morgan with app
-	app.use(logger('dev'));
-	
+	app.use(logger("dev"));
+
 	// Set Body Parser
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: false }));
@@ -53,56 +53,43 @@
 		next();
 	});
 	//=================================================
-		// mongoose.connect(process.env.MONGODB_URI);
-		// mongoose.connect(process.env.MONGODB_URI_ALT);
-		// mongoose.connect('mongodb://localhost:27017');
-		mongoose.connect('mongodb://localhost/medium_articles');
-		var db = mongoose.connection;
-	
-		db.on('error', function(err){
-			console.log('Mongoose error:',err);
-		})
-		db.once("open", function() {
-			// we're connected!
-			console.log('Mongoose connected!');
-		});
-	
-		var Schema = mongoose.Schema;
-	
+	mongoose.connect(process.env.MONGODB_URI);
+	// mongoose.connect(process.env.MONGODB_URI_ALT);
+	// mongoose.connect('mongodb://localhost:27017');
+	// mongoose.connect("mongodb://localhost/medium_articles");
+	var db = mongoose.connection;
+
+	db.on("error", function(err) {
+		console.log("Mongoose error:", err);
+	});
+	db.once("open", function() {
+		// we're connected!
+		console.log("Mongoose connected!");
+	});
+
+	var Schema = mongoose.Schema;
+
 	//=================================================
-		//   var entry = new Article({
-		// 	  title: 'Pizza is delicious.',
-		// 	  link: 'https://che.ng',
-		// 	  author: 'Batman Batman',
-		// 	  author_profile: 'https://instagram.com/wayncheng',
-		// 	  date: 'Aug 24'
-		//   });
-	
-		//   // Now, save that entry to the db
-		//   entry.save(function(err, doc) {
-		// 	if (err) { console.log(err); }
-		// 	else {
-		// 	  console.log(doc);
-		// 	}
-		//   });
+	//   var entry = new Article({
+	// 	  title: 'Pizza is delicious.',
+	// 	  link: 'https://che.ng',
+	// 	  author: 'Batman Batman',
+	// 	  author_profile: 'https://instagram.com/wayncheng',
+	// 	  date: 'Aug 24'
+	//   });
+
+	//   // Now, save that entry to the db
+	//   entry.save(function(err, doc) {
+	// 	if (err) { console.log(err); }
+	// 	else {
+	// 	  console.log(doc);
+	// 	}
+	//   });
 
 	//==================================================
 	let newArticleCount = 0;
+
 	//==================================================
-	app.get('/', function(req,res){
-		Article.find({}, function(error, doc) {
-			if (error) { console.log(error); }
-			else {
-			//   res.json(doc);
-			  res.render('feed', {
-				  results: doc,
-				  title: 'Top Stories on Medium',
-				  newArticleCount: newArticleCount
-			  })
-			}
-		  });
-	})
-//==================================================
 	app.get("/fetch", function(req, res) {
 		var results = [];
 		var qURL = "https://medium.com/browse/top";
@@ -126,26 +113,27 @@
 
 				// Check if link is already in database using count...
 				// If the count for matches is greater than 0, exit.
-				Article.count({link: link}, function (err, count){ 
-					if(count>0){
+				Article.count({ link: link }, function(err, count) {
+					if (count > 0) {
 						return;
-					}
-					else {
+					} else {
 						newArticleCount++;
-						
+
 						// Article Thumbnail Image (doesn't work)
 						// var imageURL = $el.find(".progressiveMedia-image").attr("data-src");
 						// var thumbURL = $el.find(".progressiveMedia-thumbnail").attr("src").u-block u-backgroundSizeCover u-backgroundOriginBorderBox
-						
+
 						// Meta details
 						var metaWrap = $el.find(".postMetaInline-authorLockup");
-						
+
 						var authorURL_raw = metaWrap.children("a").attr("href");
 						var authorURL = authorURL_raw.split("?source")[0];
 						var author = metaWrap.children("a").text();
-						
-						var dateRaw = metaWrap.find(".js-postMetaInlineSupplemental a time").attr("datetime");
-						var date = moment(dateRaw).format('MMM D, YY');
+
+						var dateRaw = metaWrap
+							.find(".js-postMetaInlineSupplemental a time")
+							.attr("datetime");
+						var date = moment(dateRaw).format("MMM D, YY");
 
 						let articleData = new Article({
 							title: title,
@@ -154,65 +142,134 @@
 							author_profile: authorURL,
 							date: date
 						});
-						articleData.save(function(err,doc){
-							if(err) throw err;
+						articleData.save(function(err, doc) {
+							if (err) throw err;
 							else {
-								console.log('doc',doc);
+								console.log("doc", doc);
 							}
-						})
+						});
 					}
-				}); 
+				});
 			});
-			res.redirect('/');
+			res.redirect("/");
 		});
 
 		// }
 	});
 
-// SAVING ITEMS ==================================================
-	app.post("/api/save", function(req, res){
+	// SAVING ITEMS ==================================================
+	app.post("/api/save", function(req, res) {
 		let { _id, saved } = req.body;
-		console.log('--> _id',_id);
-		console.log('--> saved',saved);
-		
+		console.log("--> _id", _id);
+		console.log("--> saved", saved);
+
 		// Find document by id, then updated saved to the new status, which we got above
-		let query = {_id: _id};
-		Article.findOneAndUpdate(query, {$set: { saved: saved }}, function(err,doc){
-			if(err) console.log(err)
+		let query = { _id: _id };
+		Article.findOneAndUpdate(query, { $set: { saved: saved } }, function( err, doc ) {
+			if (err) console.log(err);
 		});
 
 		// Refresh page afterwards
-		res.redirect('/');
+		res.redirect("/");
 	});
 
-// SUBMIT COMMENT ==================================================
-	app.post("/api/submit-comment", function(req, res){
+	// LOAD COMMENTS ===================================================
+	app.get("/api/comments/:id", function(req, res) {
+		console.log("req.params.id", req.params.id);
+
+		Article.findOne({ "_id": req.params.id })
+			// ..and populate all of the notes associated with it
+			.populate("comment")
+			// now, execute our query
+			.exec(function(error, doc) {
+				// Log any errors
+				if (error) {
+					console.log(error);
+				}
+				else {
+					// Otherwise, send the doc to the browser as a json object
+					// res.json(doc);
+					// Comment.find({'_id': doc._id}, function(err,doc){
+					console.log("doc", doc);
+					res.json(doc);
+					// })
+				}
+			});
+	});
+	// SUBMIT COMMENT ==================================================
+	app.post("/api/submit-comment", function(req, res) {
 		let { _id, commentText } = req.body;
-		console.log('--> _id',_id);
-		console.log('--> commentText',commentText);
+		console.log("--> _id", _id);
+		console.log("--> commentText", commentText);
 
-		
-		// Find document by id, then updated saved to the new status, which we got above
-		// let query = {_id: _id};
-		// Article.findOneAndUpdate(query, {$set: { saved: saved }}, function(err,doc){
-		// 	if(err) console.log(err)
-		// });
+		let newComment = new Comment({ body: commentText });
 
-		// Refresh page afterwards
-		res.redirect('/');
-	});
-// SAVED PAGE ==================================================
-	app.get('/saved', function(req,res){
-		Article.find({saved: true}, function(err,docs){
-			if (err) console.log(err);
-			else {
-				res.render('feed', {
-					results: docs,
-					title: "Saved Items"
-				})
+		newComment.save(function(error, doc) {
+			if (error) {
+				console.log(error);
+			} else {
+				Article.findOneAndUpdate(
+					{ _id: _id },
+					{ comment: doc._id }
+				).exec(function(err) {
+					if (err) {
+						console.log(err);
+					} else {
+						res.send(doc._id);
+					}
+				});
 			}
+		});
+		// res.redirect("/"); // Refresh page afterwards
+	});
+	// REMOVE COMMENT ==============================================
+	app.get('/api/remove/:id', function(req,res){
+		Article.remove({_id: req.params.id}, function(err){
+			if (err){
+				console.log('err',err);
+			}
+			res.send('removed comment');
 		})
 	})
+	// SAVED PAGE ==================================================
+	app.get("/saved", function(req, res) {
+		Article.find({ saved: true }, function(err, docs) {
+			if (err) console.log(err);
+			else {
+				res.render("feed", {
+					results: docs,
+					title: "Saved Items"
+				});
+			}
+		});
+	});
+	//==================================================
+	app.get("/", function(req, res) {
+		// Article.find({}, function(error, doc) {
+		// 	if (error) {
+		// 		console.log(error);
+		// 	} else {
+		// 		//   res.json(doc);
+		// 		res.render("feed", {
+		// 			results: doc,
+		// 			title: "Top Stories on Medium",
+		// 			newArticleCount: newArticleCount
+		// 		});
+		// 	}
+		// });
+		Article.find({}).sort({'scrape_date': -1}).exec(function(error, doc) {
+			if (error) {
+				console.log(error);
+			} else {
+				//   res.json(doc);
+				res.render("feed", {
+					results: doc,
+					title: "Top Stories on Medium",
+					newArticleCount: newArticleCount
+				});
+			}
+		});
+	});
 	// Basic HTML gets
 	var routes = require("./controllers/basic-controller.js");
 	app.use("/", routes);

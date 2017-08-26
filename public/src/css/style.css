@@ -292,6 +292,7 @@ h1 {
 
 .feed .feed-item .title-row {
   display: flex;
+  margin-bottom: 1rem;
 }
 
 .feed .feed-item .title-row .article-title {
@@ -302,17 +303,27 @@ h1 {
   font-weight: 700;
 }
 
-.feed .feed-item .save-item {
+.feed .feed-item .details-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.feed .feed-item .details-row p, .feed .feed-item .details-row a {
+  display: inline-block;
+  margin: 0 4px;
   color: #bdc3c7;
 }
 
-.feed .feed-item .save-item[data-save-status="true"] {
+.feed .feed-item .details-row a:hover, .feed .feed-item .details-row a:active {
   color: #f1c40f;
 }
 
-.feed .feed-item .meta-wrap {
-  display: flex;
-  justify-content: space-between;
+.feed .feed-item .details-row .save-item {
+  color: #bdc3c7;
+}
+
+.feed .feed-item .details-row .save-item[data-save-status="true"] {
+  color: #f1c40f;
 }
 
 #comments-section {
@@ -324,6 +335,7 @@ h1 {
   background-color: #fff;
   height: initial;
   max-height: 100vh;
+  border-top: 1px solid #bdc3c7;
 }
 
 #comments-section.active {
@@ -336,17 +348,17 @@ h1 {
   height: inherit;
   max-width: 700px;
   padding: 2rem 0;
-  outline: 1px solid green;
 }
 
 #comments-section .container #posted-comments {
-  outline: 1px solid blue;
   padding: 1rem;
   margin: 2rem 0;
 }
 
 #comments-section .container #posted-comments .comment {
   padding: 1rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 #comments-section .container #new-comment-area {
@@ -369,10 +381,5 @@ h1 {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  opacity: .5;
   font-size: 14px;
-}
-
-#comments-section #close-section i {
-  margin-left: 6px;
 }

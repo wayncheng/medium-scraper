@@ -6,17 +6,7 @@ $('.save-item').on('click',function(e){
 	var $t = $(this);
 	var $feedItem = $t.parents('.feed-item');
 	var mongoID = $feedItem.attr('data-mongodb-id');
-// 	// Get data from feed item
-// 	// var feedItemData = {
-// 	// 	title: $feedItem.find('.article-title').text(),
-// 	// 	link: $feedItem.find('.link-wrap').attr('href'),
-// 	// 	author: $feedItem.find('.author').text(),
-// 	// 	author_profile: $feedItem.find('.author').attr('href'),
-// 	// 	date: $feedItem.find('.publication_date').text()
-// 	// }
-// 	// console.log('feedItemData',feedItemData);
-
-// 	// State Change
+	// State Change
 	// var isSaved = $t.hasClass('saved');
 	var saveStatusAttr = $t.attr('data-save-status');
 	var newSaveState;
@@ -46,22 +36,20 @@ $('.save-item').on('click',function(e){
 			console.log('save status updated');
 		})
 
-		
-	
-	
 })
 
-
+//==================================================
+$('#close-section').on('click', closeCommentsSection);
+//==================================================
 // Toggle Comments Section
 $('.toggle-comments').on('click',function(e){
 	e.preventDefault();
-	
-
 	var $root = $(this).parents('.feed-item');
 	var itemID = $root.attr('data-mongodb-id');
 	
-	var isActive = $root.hasClass('active');
 	var $commentsSection = $('#comments-section');
+	var $commentsSection = $('#comments-section').attr('data-mongodb-id', itemID);
+	var isActive = $commentsSection.hasClass('active');
 
 	// If it is active, close the comments
 	// hide the comments section, adjust styling
@@ -71,13 +59,36 @@ $('.toggle-comments').on('click',function(e){
 	}
 	else {
 		$commentsSection.addClass('active');
-		$commentsSection.attr('data-mongodb-id',itemID);
 		
 		// Make call to database to get comments =========
-
+		$.ajax({
+			type: 'GET',
+			url: '/api/comments/'+itemID
+		}).done(function(commentsArray){
+			console.log('commentsArray',commentsArray);
+			for (var i = 0; i < commentsArray.length; i++) {
+				var commentText = commentsArray[i];
+				buildComment(commentText);
+			}
+		})
 	}
 })
+//==================================================
+$('.remove-comment').on('click', function(e){
+	e.preventDefault();
+	var $comment = $(this).parents('.comment');
+	var commentID = $comment.attr('data-comment-id');
+	console.log('commentID',commentID);
 
+	$.ajax({
+		type: 'GET',
+		url: '/api/remove/'+commentID
+	}).done(function(r){
+		console.log('r',r);
+		$comment.remove();
+	})
+})
+//==================================================
 $('#submit-comment').on('click',function(e){
 	e.preventDefault();
 	var commentText = $('textarea').val().trim();
@@ -92,15 +103,35 @@ $('#submit-comment').on('click',function(e){
 		data: postData
 	}).done(function(res){
 		console.log('comment submitted');
-	})
-})
+		console.log('res',res);
+		
+		$('textarea').val('');
+		buildComment(commentText, res);
+	});
+});
 
+//==================================================
+function buildComment(commentText, commentID){
+	var $newComment = $('<div/>');
+		$newComment.addClass('comment');
+		$newComment.attr('data-comment-id', commentID);
 
+	var $p = $('<p/>').addClass('comment-text');
+		$p.text(commentText);
+	
+	var $closeLink = $('<a/>').addClass('remove-comment');
+	var $closeIcon = $('<i/>').addClass('fa fa-window-close');
+	$closeLink.append($closeIcon);
+
+	$newComment.append($p);
+	$newComment.append($closeLink);
+	$('#posted-comments').append($newComment);
+}
+//==================================================
 function closeCommentsSection(e){
 	e.preventDefault();
 	console.log('closing comments...');
 	$('#comments-section').removeClass('active');
 	$('#comments-section').attr('data-mongodb-id','');
+	$('#comments-section').empty();
 }
-
-$('#close-section').on('click', closeCommentsSection);
